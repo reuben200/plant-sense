@@ -1,100 +1,144 @@
-# Project Definition Report (PDR)
-## Real-Time Hand Gesture Recognition for Audio Playback Control (Edge AI)
+# 🌿 Preliminary Design Review (PDR)
+## Project: **PlantSense – Edge AI Plant Identifier (React PWA)**  
+
+### **1. Project Overview**
+**PlantSense** is a **Progressive Web Application (PWA)** built with **React (Vite)** that identifies plants from images using an **on-device AI model (Edge AI)**.  
+
+It runs fully in the browser (desktop or mobile) and can work **offline** after initial installation.  
+When online, the app can **update its database** or **search the internet** for plants not found in its local collection — but **only after user consent**.
+
+The app can analyze both:
+- 🌸 **Live camera captures**, and  
+- 📸 **Uploaded images** from the device gallery or file system.
 
 ---
 
-## 1. Project Title
-**Real-Time Hand Gesture Recognition for Audio Playback Control (Edge AI)**
+### **2. Objectives**
+1. Identify plants instantly from a captured or uploaded image.  
+2. Display plant details including:
+   - Common and botanical names  
+   - Description and physical features  
+   - Medicinal or economic importance  
+   - Best growing conditions (climate, soil, sunlight, etc.)  
+   - Geographic distribution or “where to find” information  
+3. Operate offline after first use (PWA caching).  
+4. Allow optional online database update or web search when plant is unknown.  
+5. Prompt the user before performing any online operation.
 
 ---
 
-## 2. Problem Statement
-Controlling media playback typically requires physical interaction through keyboard, mouse, or touchscreen devices, which is not always convenient or hands-free. This project solves this problem by using computer vision to recognize simple hand gestures in real time through a webcam and trigger audio playback actions — **offline and on-device**, without cloud processing.
+### **3. System Architecture**
+**Architecture Type:** Hybrid Edge + Cloud  
+
+| Layer | Component | Description |
+|-------|------------|-------------|
+| **Frontend (PWA)** | React (Vite) + TensorFlow.js | User interface, camera access, and on-device inference. |
+| **Offline Storage** | IndexedDB / LocalStorage | Stores plant data and cached results for offline mode. |
+| **Edge AI Model** | TensorFlow.js (MobileNetV3 or EfficientNet-lite) | Performs image classification locally in the browser. |
+| **Service Worker** | Workbox + Vite Plugin PWA | Handles caching, offline use, and background updates. |
+| **Cloud Backend (Optional)** | Node.js + Express API | Provides online data enrichment, updates, or new species. |
+| **Database (Server)** | PostgreSQL / MongoDB | Stores plant metadata, model updates, and reference data. |
 
 ---
 
-## 3. Objectives
-- Implement real-time **hand detection and gesture recognition** on a local machine.
-- Run all inference **on-device** (Edge AI, offline).
-- Map gestures to actions:
-  - **Open palm → Play audio**
-  - **Fist → Stop audio**
-- Demonstrate gesture-driven human–computer interaction.
-- Provide a foundation for future gesture-based controls (volume, next song, etc).
+### **4. Functional Flow**
+1. **User Action:** Opens the app → chooses *Capture* or *Upload Image*.  
+2. **Inference (Edge AI):** TensorFlow.js model predicts possible species.  
+3. **Local Response:**  
+   - If **confidence ≥ threshold**, display details from local data store.  
+   - If **confidence < threshold**, prompt user:  
+     > “I couldn’t identify this plant with high confidence. Would you like me to search online?”  
+4. **Online Mode (with consent):**  
+   - Sends minimal data (image fingerprint or label) to backend/cloud API.  
+   - Retrieves information from public APIs (GBIF, Wikipedia, POWO, etc.).  
+   - Updates local cache and enriches plant database.  
+5. **Offline Cache:** Newly added information is stored locally for future offline use.
 
 ---
 
-## 4. Scope
-### In Scope
-- Webcam-based hand tracking (MediaPipe Hands).
-- Intermediate-level gesture detection (open vs fist).
-- Offline playback of a built-in tone/audio.
-- Execution using Python on a laptop (no external device).
-
-### Out of Scope (for Version 1)
-- System-wide media control (Spotify, VLC, OS-level API).
-- Multi-gesture actions (next track, volume, etc).
-- Mobile deployment (can be future version).
-- Custom model training (MediaPipe pre-trained only).
-
----
-
-## 5. Tools & Technologies
-| Category | Technology |
-|---------|-------------|
-| Inference | MediaPipe |
-| Vision Input | Laptop webcam |
-| Programming Language | Python |
-| Audio Playback | Built-in tone / Python audio library |
-| OS Requirement | Windows, macOS, or Linux |
-| Deployment | Local offline execution |
+### **5. Key Components**
+| Module | Description |
+|---------|--------------|
+| **Camera Capture** | Uses `getUserMedia()` to access webcam; captures still images. |
+| **Image Upload Handler** | Allows users to upload existing images for identification. |
+| **AI Model Loader** | Loads and initializes the pre-trained TensorFlow.js model. |
+| **Inference Engine** | Processes input images → predicts plant species + confidence score. |
+| **Local Database Manager** | Manages IndexedDB records for offline plant data. |
+| **Sync Manager** | Checks for updates and syncs new data when online. |
+| **UI Components** | Responsive plant cards showing name, description, and features. |
+| **User Consent Dialog** | Prompts for permission before performing online lookups. |
 
 ---
 
-## 6. System Overview
-The webcam captures live video frames. MediaPipe processes each frame locally and identifies key hand landmarks. Based on the landmark arrangement, the system classifies the hand gesture (open palm or fist). The recognized gesture triggers an action — start or stop playing an audio tone — in real time.
+### **6. Technologies**
+| Category | Choice |
+|-----------|--------|
+| **Frontend Framework** | React 18 + Vite |
+| **Edge AI Library** | TensorFlow.js |
+| **Styling** | Tailwind CSS / ShadCN UI |
+| **PWA Tools** | Vite Plugin PWA, Workbox |
+| **Offline Storage** | IndexedDB (via Dexie.js) |
+| **Backend (Optional)** | Node.js + Express + PostgreSQL |
+| **External APIs** | GBIF API, Wikipedia API, Plants of the World Online (POWO) |
 
 ---
 
-## 7. Architecture Diagram (Conceptual)
-
-```
-Webcam → MediaPipe → Gesture Logic → Action Trigger → Audio Playback
-```
-
----
-
-## 8. Data Flow
-
-| Step | Process |
-|------|---------|
-| 1 | Webcam captures frame |
-| 2 | Frame sent to MediaPipe hand tracking |
-| 3 | Landmarks extracted & interpreted |
-| 4 | Gesture (open / fist) recognized |
-| 5 | If open → Play audio |
-| 6 | If fist → Stop audio |
+### **7. Minimum Viable Product (MVP)**
+✅ Upload or capture plant image  
+✅ On-device identification via TensorFlow.js  
+✅ Show common name + brief description from local database  
+✅ Full offline functionality via PWA caching  
+✅ User consent before any online search  
+✅ Local caching of new plants after online lookup  
 
 ---
 
-## 9. Success Criteria
-- System detects a hand gesture in real time.
-- Open palm → reliably starts the audio.
-- Fist → reliably stops the audio.
-- All processing happens **locally and offline**.
-- Works with standard laptop webcam.
+### **8. Future Enhancements**
+- 🌍 Map visualization of plant distribution  
+- 💊 Expanded database of medicinal/economic uses  
+- 🧠 Continuous learning (federated model updates)  
+- 📷 Augmented Reality mode for plant part labeling  
+- 👥 User-submitted plant photos for community data expansion  
 
 ---
 
-## 10. Future Extensions
-- Add more gesture actions (thumbs up/down, V-sign, etc).
-- Control external media players (Spotify / VLC).
-- Slide presentation control for teaching/speaking.
-- Deployment on mobile or Raspberry Pi.
-- Sign language interpretation (advanced).
-- Custom gesture classifier training.
+### **9. Risks & Mitigations**
+| Risk | Mitigation |
+|------|-------------|
+| Large AI model size → slow loading | Use quantized MobileNetV3-Lite model |
+| Browser compatibility | Test across Chrome, Edge, Firefox, Safari |
+| Unavailable APIs during fetch | Cache last successful responses |
+| Misidentification | Show top 3 results + confidence scores |
 
 ---
 
-## 11. Version
-This document describes **Version 1** of the project.
+### **10. Image Access (Camera + Upload)**
+PlantSense can process:
+1. **Live camera captures** — via the browser’s `navigator.mediaDevices.getUserMedia()` API.  
+2. **Uploaded images** — users can upload `.jpg`, `.jpeg`, or `.png` files through a file input field.  
+
+The uploaded or captured image is passed to the TensorFlow.js model for inference without being sent to any external server (ensuring privacy).  
+
+---
+
+### **11. Next Steps**
+1. ✅ Initialize Vite + React + PWA scaffolding.  
+2. ✅ Integrate TensorFlow.js and load a sample MobileNet model.  
+3. ✅ Implement camera and image upload components.  
+4. ✅ Add inference logic and display predicted plant details.  
+5. ⚙️ Connect IndexedDB for offline metadata storage.  
+6. 🌐 Build an optional backend/API for database enrichment.  
+7. 🧠 Package and optimize PWA for offline-first operation.  
+
+---
+
+### **12. References**
+- [TensorFlow.js Models](https://www.tensorflow.org/js/models)  
+- [GBIF API Documentation](https://www.gbif.org/developer/summary)  
+- [Wikipedia REST API](https://www.mediawiki.org/wiki/API:REST_API)  
+- [Plants of the World Online](https://powo.science.kew.org/)  
+- [Workbox PWA Docs](https://developer.chrome.com/docs/workbox)
+
+---
+
+© 2025 PlantSense – Edge AI for Sustainable Awareness 🌿
