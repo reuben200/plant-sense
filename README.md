@@ -141,4 +141,58 @@ The uploaded or captured image is passed to the TensorFlow.js model for inferenc
 
 ---
 
+---
+
+### **13. System Architecture Diagram**
+
+```mermaid
+flowchart TD
+
+subgraph User["👤 User"]
+  A1["📷 Capture Image"] --> A2["📁 Or Upload Image"]
+end
+
+subgraph PWA["💻 PlantSense (React + Vite PWA)"]
+  B1["🧠 TensorFlow.js Model (Edge AI)"]
+  B2["📂 Local Plant Database (IndexedDB)"]
+  B3["⚙️ Inference Engine"]
+  B4["💾 Service Worker (Offline Cache)"]
+  B5["🔔 Consent Dialog"]
+end
+
+subgraph Cloud["☁️ Cloud Services (Optional)"]
+  C1["🌍 Node.js API Gateway"]
+  C2["🧬 Plant Metadata DB (PostgreSQL/MongoDB)"]
+  C3["🔎 External APIs (GBIF / POWO / Wikipedia)"]
+end
+
+%% Flow connections
+User -->|1️⃣ Image Input| PWA
+A2 -->|Captured/Uploaded Image| B3
+B3 -->|Run Inference| B1
+B1 -->|Predicted Species + Confidence| B2
+B2 -->|Local Lookup| B3
+
+%% Decision Branch
+B3 -->|Confidence ≥ Threshold| D1[✅ Show Plant Info (Offline Mode)]
+B3 -->|Confidence < Threshold| B5
+B5 -->|User Grants Permission| C1
+B5 -->|User Declines| D2[⚠️ Display "Not Found" Locally]
+
+%% Cloud interactions
+C1 -->|Query / Fetch Data| C2
+C1 -->|Fetch Enrichment Data| C3
+C3 -->|Return Description / Metadata| C1
+C2 -->|Send Update Manifest| B4
+C1 -->|Return Enriched Plant Info| B2
+
+%% Offline sync
+B4 -->|Sync Cached Data| B2
+B2 -->|Updated Local Records| D3[🌿 Display Updated Plant Info]
+
+style User fill:#e6ffe6,stroke:#228B22,stroke-width:2px
+style PWA fill:#f5f5ff,stroke:#4169E1,stroke-width:2px
+style Cloud fill:#fff8dc,stroke:#DAA520,stroke-width:2px
+
+
 © 2025 PlantSense – Edge AI for Sustainable Awareness 🌿
