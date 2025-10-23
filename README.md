@@ -188,11 +188,10 @@ C1 -->|Return Enriched Plant Info| B2
 B4 -->|Sync Cached Data| B2
 B2 -->|Updated Local Records| D3["Display Updated Plant Info"]
 
-style User fill:#e6ffe6,stroke:#228B22,stroke-width:2px
-style PWA fill:#f5f5ff,stroke:#4169E1,stroke-width:2px
-style Cloud fill:#fff8dc,stroke:#DAA520,stroke-width:2px
+style User fill:#e6ffe6,stroke:#228B22,stroke-width: 2px
+style PWA fill:#f5f5ff,stroke:#4169E1,stroke-width: 2px
+style Cloud fill:#fff8dc,stroke:#DAA520,stroke-width: 2px
 
-```mermaid
 
 
 © 2025 PlantSense – Edge AI for Sustainable Awareness 🌿
