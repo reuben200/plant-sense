@@ -194,4 +194,4 @@ style Cloud fill:#fff8dc,stroke:#DAA520,stroke-width:2px
 
 
 
-© 2025 Plant Sense – Edge AI for Sustainable Awareness 🌿
+***© 2025 Plant Sense – Edge AI for Sustainable Awareness*** 🌿
